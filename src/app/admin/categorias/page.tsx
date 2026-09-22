@@ -1,4 +1,11 @@
-export default function CategoriasPage() {
+import { listarCategorias } from "@/lib/actions/categorias";
+import { CategoriasManager } from "./categorias-manager";
+
+export const dynamic = "force-dynamic";
+
+export default async function CategoriasPage() {
+  const categorias = await listarCategorias();
+
   return (
     <div>
       <div className="mb-8">
@@ -8,13 +15,20 @@ export default function CategoriasPage() {
         <h1 className="mt-1.5 font-serif text-3xl text-ink md:text-4xl">
           Categorias
         </h1>
-      </div>
-      <div className="rounded-3xl border border-white/60 bg-white/55 p-10 text-center backdrop-blur-sm">
-        <p className="font-serif text-xl text-ink">Em breve 🏷️</p>
         <p className="mt-2 text-sm text-cocoa/60">
-          Cadastro de categorias na próxima etapa, junto com os produtos.
+          Grupos que organizam os produtos na vitrine (ex: Bolo de Pote, Bolo
+          Gelado).
         </p>
       </div>
+
+      <CategoriasManager
+        categoriasIniciais={categorias.map((c) => ({
+          id: c.id,
+          nome: c.nome,
+          ordem: c.ordem,
+          produtosCount: c._count.produtos,
+        }))}
+      />
     </div>
   );
 }

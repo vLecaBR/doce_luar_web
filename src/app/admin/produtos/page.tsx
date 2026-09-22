@@ -1,4 +1,15 @@
-export default function ProdutosPage() {
+import { listarProdutos } from "@/lib/actions/produtos";
+import { listarCategorias } from "@/lib/actions/categorias";
+import { ProdutosManager } from "./produtos-manager";
+
+export const dynamic = "force-dynamic";
+
+export default async function ProdutosPage() {
+  const [produtos, categorias] = await Promise.all([
+    listarProdutos(),
+    listarCategorias(),
+  ]);
+
   return (
     <div>
       <div className="mb-8">
@@ -8,14 +19,15 @@ export default function ProdutosPage() {
         <h1 className="mt-1.5 font-serif text-3xl text-ink md:text-4xl">
           Produtos
         </h1>
-      </div>
-      <div className="rounded-3xl border border-white/60 bg-white/55 p-10 text-center backdrop-blur-sm">
-        <p className="font-serif text-xl text-ink">Em breve 🍰</p>
         <p className="mt-2 text-sm text-cocoa/60">
-          Cadastro de produtos com upload de imagem (Supabase Storage) na próxima
-          etapa.
+          Os itens que aparecem na vitrine do site.
         </p>
       </div>
+
+      <ProdutosManager
+        produtosIniciais={produtos}
+        categorias={categorias.map((c) => ({ id: c.id, nome: c.nome }))}
+      />
     </div>
   );
 }
