@@ -10,6 +10,7 @@ import {
   ExternalLink,
   Moon,
   LogOut,
+  Send,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -18,6 +19,7 @@ const nav = [
   { href: "/admin/produtos", label: "Produtos", icon: Cake },
   { href: "/admin/categorias", label: "Categorias", icon: Tags },
   { href: "/admin/clientes", label: "Clientes", icon: Users },
+  { href: "/admin/disparos", label: "Disparos", icon: Send },
 ];
 
 export default function AdminLayout({
