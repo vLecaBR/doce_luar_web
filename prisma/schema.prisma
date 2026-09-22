@@ -47,3 +47,42 @@ model Produto {
 
   @@map("produtos")
 }
+
+model Campanha {
+  id           String    @id @default(uuid())
+  titulo       String
+  mensagem     String
+  imagemUrl    String?
+  criadoEm     DateTime  @default(now())
+  atualizadoEm DateTime  @updatedAt
+  disparos     Disparo[]
+
+  @@map("campanhas")
+}
+
+model Disparo {
+  id          String    @id @default(uuid())
+  mensagem    String
+  imagemUrl   String?
+  status      String    @default("pendente") // pendente | enviando | concluido | erro
+  total       Int       @default(0)
+  enviados    Int       @default(0)
+  falhas      Int       @default(0)
+  erro        String?
+  campanhaId  String?
+  campanha    Campanha? @relation(fields: [campanhaId], references: [id], onDelete: SetNull)
+  criadoEm    DateTime  @default(now())
+  iniciadoEm  DateTime?
+  concluidoEm DateTime?
+
+  @@map("disparos")
+}
+
+model BotStatus {
+  id           String   @id
+  estado       String   @default("desconectado") // desconectado | qr | conectado
+  qr           String?
+  atualizadoEm DateTime @updatedAt
+
+  @@map("bot_status")
+}
