@@ -1,0 +1,49 @@
+// Schema do painel admin (dono das migrations).
+// Gerador clássico para bater com o projeto do bot (import de '@prisma/client').
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Cliente {
+  id           String   @id @default(uuid())
+  nome         String
+  telefone     String   @unique
+  email        String?
+  notas        String?
+  ativo        Boolean  @default(true)
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  @@map("clientes")
+}
+
+model Categoria {
+  id       String    @id @default(uuid())
+  nome     String
+  ordem    Int       @default(0)
+  criadoEm DateTime  @default(now())
+  produtos Produto[]
+
+  @@map("categorias")
+}
+
+model Produto {
+  id           String    @id @default(uuid())
+  nome         String
+  descricao    String?
+  preco        Decimal   @db.Decimal(10, 2)
+  imagemUrl    String?
+  ativo        Boolean   @default(true)
+  categoriaId  String
+  categoria    Categoria @relation(fields: [categoriaId], references: [id])
+  criadoEm     DateTime  @default(now())
+  atualizadoEm DateTime  @updatedAt
+
+  @@map("produtos")
+}
