@@ -4,14 +4,28 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+function brl(v: number) {
+  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
 export default async function DashboardPage() {
-  const [produtosCount, categoriasCount, clientesCount, clientesRecentes] =
-    await Promise.all([
-      prisma.produto.count(),
-      prisma.categoria.count(),
-      prisma.cliente.count(),
-      prisma.cliente.findMany({ orderBy: { criadoEm: "desc" }, take: 4 }),
-    ]);
+  const [
+    produtosCount,
+    categoriasCount,
+    clientesCount,
+    clientesRecentes,
+    produtosRecentes,
+  ] = await Promise.all([
+    prisma.produto.count(),
+    prisma.categoria.count(),
+    prisma.cliente.count(),
+    prisma.cliente.findMany({ orderBy: { criadoEm: "desc" }, take: 4 }),
+    prisma.produto.findMany({
+      orderBy: { criadoEm: "desc" },
+      take: 4,
+      include: { categoria: { select: { nome: true } } },
+    }),
+  ]);
 
   const stats = [
     { label: "Produtos no site", value: produtosCount, icon: Cake, to: "/admin/produtos" },
@@ -53,7 +67,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="mt-10 grid gap-6 lg:grid-cols-2">
-        {/* Últimos produtos (vazio até o CRUD de produtos) */}
+        {/* Últimos produtos */}
         <div className="rounded-3xl border border-white/60 bg-white/55 p-6 backdrop-blur-sm">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-serif text-xl text-ink">Últimos produtos</h2>
@@ -64,12 +78,42 @@ export default async function DashboardPage() {
               Gerenciar
             </Link>
           </div>
-          <p className="text-sm text-cocoa/50">
-            Nenhum produto cadastrado ainda. Em breve o cadastro com imagens.
-          </p>
+          {produtosRecentes.length === 0 ? (
+            <p className="text-sm text-cocoa/50">
+              Nenhum produto cadastrado ainda.
+            </p>
+          ) : (
+            <ul className="space-y-3">
+              {produtosRecentes.map((p) => (
+                <li key={p.id} className="flex items-center gap-3">
+                  <span className="h-11 w-11 shrink-0 overflow-hidden rounded-xl bg-vanilla">
+                    {p.imagemUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={p.imagemUrl}
+                        alt={p.nome}
+                        className="h-full w-full object-cover"
+                      />
+                    )}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-ink">
+                      {p.nome}
+                    </p>
+                    <p className="text-[11px] text-cocoa/50">
+                      {p.categoria.nome}
+                    </p>
+                  </div>
+                  <span className="text-sm font-medium text-bordo">
+                    {brl(Number(p.preco))}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
-        {/* Clientes recentes (do banco) */}
+        {/* Clientes recentes */}
         <div className="rounded-3xl border border-white/60 bg-white/55 p-6 backdrop-blur-sm">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-serif text-xl text-ink">Clientes recentes</h2>
