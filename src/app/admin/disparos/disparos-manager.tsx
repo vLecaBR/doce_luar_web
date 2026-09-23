@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Send, RefreshCw, Trash2, ImageIcon } from "lucide-react";
+import { Send, RefreshCw, Trash2, ImageIcon, Users, Layers, User } from "lucide-react";
 import {
   criarDisparo,
   reenviarCampanha,
@@ -17,6 +17,7 @@ type Disparo = {
   total: number;
   enviados: number;
   falhas: number;
+  descricaoDestino: string | null;
   criadoEm: string | Date;
 };
 
@@ -27,6 +28,16 @@ type Campanha = {
   imagemUrl: string | null;
   criadoEm: string | Date;
 };
+
+type Cliente = {
+  id: string;
+  nome: string;
+  telefone: string;
+  ativo: boolean;
+  segmentoNome: string | null;
+};
+
+type Segmento = { id: string; nome: string; clientesCount: number };
 
 const inputCls =
   "w-full rounded-xl border border-cocoa/15 bg-white/70 px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-cocoa/35 focus:border-caramel focus:ring-2 focus:ring-caramel/20";
@@ -58,20 +69,26 @@ function fmtData(d: string | Date) {
   });
 }
 
+type Modo = "todos" | "segmento" | "pessoas";
+
 export function DisparosManager({
   disparosIniciais,
   campanhas,
+  clientes,
+  segmentos,
 }: {
   disparosIniciais: Disparo[];
   campanhas: Campanha[];
+  clientes: Cliente[];
+  segmentos: Segmento[];
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [salvarCampanha, setSalvarCampanha] = useState(false);
+  const [modo, setModo] = useState<Modo>("todos");
 
-  // Atualiza a página sozinha enquanto houver disparo na fila / em andamento.
   useEffect(() => {
     const ativo = disparosIniciais.some(
       (d) => d.status === "pendente" || d.status === "enviando",
@@ -89,6 +106,7 @@ export function DisparosManager({
     if (res.error) return setErro(res.error);
     (document.getElementById("form-disparo") as HTMLFormElement | null)?.reset();
     setSalvarCampanha(false);
+    setModo("todos");
     startTransition(() => router.refresh());
   }
 
@@ -104,6 +122,12 @@ export function DisparosManager({
     await removerCampanha(id);
     startTransition(() => router.refresh());
   }
+
+  const opcoesModo: { valor: Modo; label: string; icon: typeof Users }[] = [
+    { valor: "todos", label: "Todos os ativos", icon: Users },
+    { valor: "segmento", label: "Por segmento", icon: Layers },
+    { valor: "pessoas", label: "Escolher pessoas", icon: User },
+  ];
 
   return (
     <div className="space-y-8">
@@ -123,10 +147,11 @@ export function DisparosManager({
         <textarea
           name="mensagem"
           rows={4}
-          placeholder="Escreva a mensagem que vai para todos os clientes ativos…"
+          placeholder="Escreva a mensagem…"
           className={inputCls}
           required
         />
+
         <div className="mt-3 flex items-center gap-2 text-cocoa/60">
           <ImageIcon size={16} />
           <span className="text-xs">Imagem (opcional)</span>
@@ -137,6 +162,77 @@ export function DisparosManager({
           accept="image/*"
           className={`${fileCls} mt-1`}
         />
+
+        {/* Destinatários */}
+        <div className="mt-5">
+          <p className="mb-2 text-sm font-medium text-ink">Enviar para</p>
+          <div className="flex flex-wrap gap-2">
+            {opcoesModo.map(({ valor, label, icon: Icon }) => (
+              <label
+                key={valor}
+                className={`flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm transition-colors ${
+                  modo === valor
+                    ? "border-bordo bg-bordo text-cream"
+                    : "border-cocoa/15 bg-white/60 text-cocoa/70 hover:border-caramel"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="modo"
+                  value={valor}
+                  checked={modo === valor}
+                  onChange={() => setModo(valor)}
+                  className="sr-only"
+                />
+                <Icon size={15} />
+                {label}
+              </label>
+            ))}
+          </div>
+
+          {modo === "segmento" && (
+            <select name="segmentoId" defaultValue="" className={`${inputCls} mt-3`}>
+              <option value="" disabled>
+                Escolha um segmento…
+              </option>
+              {segmentos.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.nome} ({s.clientesCount})
+                </option>
+              ))}
+            </select>
+          )}
+
+          {modo === "pessoas" && (
+            <div className="mt-3 max-h-56 overflow-y-auto rounded-xl border border-cocoa/15 bg-white/60 p-2">
+              {clientes.length === 0 ? (
+                <p className="px-2 py-3 text-sm text-cocoa/50">
+                  Nenhum cliente cadastrado.
+                </p>
+              ) : (
+                clientes.map((c) => (
+                  <label
+                    key={c.id}
+                    className="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 text-sm hover:bg-vanilla/50"
+                  >
+                    <input
+                      type="checkbox"
+                      name="pessoas"
+                      value={c.id}
+                      className="h-4 w-4 rounded border-cocoa/30 accent-bordo"
+                    />
+                    <span className="flex-1 text-ink">{c.nome}</span>
+                    <span className="text-xs text-cocoa/50">
+                      {c.telefone}
+                      {c.segmentoNome ? ` · ${c.segmentoNome}` : ""}
+                      {!c.ativo ? " · inativo" : ""}
+                    </span>
+                  </label>
+                ))
+              )}
+            </div>
+          )}
+        </div>
 
         <label className="mt-4 flex items-center gap-2 text-sm text-cocoa/70">
           <input
@@ -170,7 +266,7 @@ export function DisparosManager({
         </p>
       </form>
 
-      {/* Histórico de disparos */}
+      {/* Histórico */}
       <div>
         <h2 className="mb-3 font-serif text-lg text-ink">Histórico</h2>
         {disparosIniciais.length === 0 ? (
@@ -197,6 +293,11 @@ export function DisparosManager({
                       {info.label}
                     </span>
                   </div>
+                  {d.descricaoDestino && (
+                    <p className="mt-1 text-xs text-caramel">
+                      → {d.descricaoDestino}
+                    </p>
+                  )}
                   <div className="mt-2 flex items-center justify-between text-xs text-cocoa/50">
                     <span>{fmtData(d.criadoEm)}</span>
                     <span>
@@ -256,7 +357,7 @@ export function DisparosManager({
                     className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-bordo px-4 py-2 text-xs font-medium text-cream transition-colors hover:bg-bordo-deep disabled:opacity-50"
                   >
                     <RefreshCw size={14} />
-                    Reenviar
+                    Reenviar (todos)
                   </button>
                   <button
                     onClick={() => onExcluirCampanha(c.id, c.titulo)}

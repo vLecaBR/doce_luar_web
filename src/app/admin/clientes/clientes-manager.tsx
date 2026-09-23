@@ -26,6 +26,23 @@ type Segmento = { id: string; nome: string };
 const inputCls =
   "w-full rounded-xl border border-cocoa/15 bg-white/70 px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-cocoa/35 focus:border-caramel focus:ring-2 focus:ring-caramel/20";
 
+function Campo({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-caramel">
+        {label}
+      </span>
+      {children}
+    </label>
+  );
+}
+
 export function ClientesManager({
   clientesIniciais,
   segmentos,
@@ -150,53 +167,68 @@ export function ClientesManager({
                     <td colSpan={5} className="px-5 py-4">
                       <form
                         action={(fd) => onAtualizar(c.id, fd)}
-                        className="grid gap-2 sm:grid-cols-6 sm:items-center"
+                        className="space-y-4"
                       >
-                        <input
-                          name="nome"
-                          defaultValue={c.nome}
-                          className={inputCls}
-                          required
-                        />
-                        <input
-                          name="telefone"
-                          defaultValue={c.telefone}
-                          className={inputCls}
-                          required
-                        />
-                        <input
-                          name="email"
-                          defaultValue={c.email ?? ""}
-                          className={inputCls}
-                        />
-                        <select
-                          name="segmentoId"
-                          defaultValue={c.segmentoId ?? ""}
-                          className={inputCls}
-                        >
-                          <option value="">Sem segmento</option>
-                          {segmentos.map((s) => (
-                            <option key={s.id} value={s.id}>
-                              {s.nome}
-                            </option>
-                          ))}
-                        </select>
-                        <input
-                          name="notas"
-                          defaultValue={c.notas ?? ""}
-                          className={inputCls}
-                        />
+                        <p className="font-serif text-base text-ink">
+                          Editando: {c.nome}
+                        </p>
+                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                          <Campo label="Nome">
+                            <input
+                              name="nome"
+                              defaultValue={c.nome}
+                              className={inputCls}
+                              required
+                            />
+                          </Campo>
+                          <Campo label="Telefone">
+                            <input
+                              name="telefone"
+                              defaultValue={c.telefone}
+                              className={inputCls}
+                              required
+                            />
+                          </Campo>
+                          <Campo label="E-mail">
+                            <input
+                              name="email"
+                              defaultValue={c.email ?? ""}
+                              className={inputCls}
+                            />
+                          </Campo>
+                          <Campo label="Segmento">
+                            <select
+                              name="segmentoId"
+                              defaultValue={c.segmentoId ?? ""}
+                              className={inputCls}
+                            >
+                              <option value="">Sem segmento</option>
+                              {segmentos.map((s) => (
+                                <option key={s.id} value={s.id}>
+                                  {s.nome}
+                                </option>
+                              ))}
+                            </select>
+                          </Campo>
+                          <Campo label="Notas">
+                            <input
+                              name="notas"
+                              defaultValue={c.notas ?? ""}
+                              className={inputCls}
+                            />
+                          </Campo>
+                        </div>
                         <div className="flex gap-2">
                           <button
                             disabled={isPending}
-                            className="rounded-full bg-bordo px-4 py-2.5 text-sm font-medium text-cream hover:bg-bordo-deep disabled:opacity-50"
+                            className="rounded-full bg-bordo px-5 py-2.5 text-sm font-medium text-cream hover:bg-bordo-deep disabled:opacity-50"
                           >
                             Salvar
                           </button>
                           <button
                             type="button"
                             onClick={() => setEditando(null)}
-                            className="rounded-full border border-cocoa/15 px-4 py-2.5 text-sm text-cocoa transition-colors hover:border-caramel hover:text-caramel"
+                            className="rounded-full border border-cocoa/15 px-5 py-2.5 text-sm text-cocoa transition-colors hover:border-caramel hover:text-caramel"
                           >
                             Cancelar
                           </button>

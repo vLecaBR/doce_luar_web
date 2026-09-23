@@ -19,6 +19,23 @@ type Categoria = {
 const inputCls =
   "w-full rounded-xl border border-cocoa/15 bg-white/70 px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-cocoa/35 focus:border-caramel focus:ring-2 focus:ring-caramel/20";
 
+function Campo({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-caramel">
+        {label}
+      </span>
+      {children}
+    </label>
+  );
+}
+
 export function CategoriasManager({
   categoriasIniciais,
 }: {
@@ -125,31 +142,40 @@ export function CategoriasManager({
                     <td colSpan={4} className="px-5 py-4">
                       <form
                         action={(fd) => onAtualizar(c.id, fd)}
-                        className="grid gap-2 sm:grid-cols-[1fr_auto_auto] sm:items-center"
+                        className="space-y-4"
                       >
-                        <input
-                          name="nome"
-                          defaultValue={c.nome}
-                          className={inputCls}
-                          required
-                        />
-                        <input
-                          name="ordem"
-                          type="number"
-                          defaultValue={c.ordem}
-                          className={`${inputCls} sm:w-28`}
-                        />
+                        <p className="font-serif text-base text-ink">
+                          Editando: {c.nome}
+                        </p>
+                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                          <Campo label="Nome">
+                            <input
+                              name="nome"
+                              defaultValue={c.nome}
+                              className={inputCls}
+                              required
+                            />
+                          </Campo>
+                          <Campo label="Ordem">
+                            <input
+                              name="ordem"
+                              type="number"
+                              defaultValue={c.ordem}
+                              className={inputCls}
+                            />
+                          </Campo>
+                        </div>
                         <div className="flex gap-2">
                           <button
                             disabled={isPending}
-                            className="rounded-full bg-bordo px-4 py-2.5 text-sm font-medium text-cream hover:bg-bordo-deep disabled:opacity-50"
+                            className="rounded-full bg-bordo px-5 py-2.5 text-sm font-medium text-cream hover:bg-bordo-deep disabled:opacity-50"
                           >
                             Salvar
                           </button>
                           <button
                             type="button"
                             onClick={() => setEditando(null)}
-                            className="rounded-full border border-cocoa/15 px-4 py-2.5 text-sm text-cocoa transition-colors hover:border-caramel hover:text-caramel"
+                            className="rounded-full border border-cocoa/15 px-5 py-2.5 text-sm text-cocoa transition-colors hover:border-caramel hover:text-caramel"
                           >
                             Cancelar
                           </button>

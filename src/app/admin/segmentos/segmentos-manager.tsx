@@ -14,6 +14,23 @@ type Segmento = { id: string; nome: string; clientesCount: number };
 const inputCls =
   "w-full rounded-xl border border-cocoa/15 bg-white/70 px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-cocoa/35 focus:border-caramel focus:ring-2 focus:ring-caramel/20";
 
+function Campo({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-caramel">
+        {label}
+      </span>
+      {children}
+    </label>
+  );
+}
+
 export function SegmentosManager({
   segmentosIniciais,
 }: {
@@ -111,27 +128,36 @@ export function SegmentosManager({
                     <td colSpan={3} className="px-5 py-4">
                       <form
                         action={(fd) => onAtualizar(s.id, fd)}
-                        className="flex flex-wrap items-center gap-2"
+                        className="space-y-4"
                       >
-                        <input
-                          name="nome"
-                          defaultValue={s.nome}
-                          className={`${inputCls} flex-1`}
-                          required
-                        />
-                        <button
-                          disabled={isPending}
-                          className="rounded-full bg-bordo px-4 py-2.5 text-sm font-medium text-cream hover:bg-bordo-deep disabled:opacity-50"
-                        >
-                          Salvar
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setEditando(null)}
-                          className="rounded-full border border-cocoa/15 px-4 py-2.5 text-sm text-cocoa transition-colors hover:border-caramel hover:text-caramel"
-                        >
-                          Cancelar
-                        </button>
+                        <p className="font-serif text-base text-ink">
+                          Editando: {s.nome}
+                        </p>
+                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                          <Campo label="Nome">
+                            <input
+                              name="nome"
+                              defaultValue={s.nome}
+                              className={inputCls}
+                              required
+                            />
+                          </Campo>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            disabled={isPending}
+                            className="rounded-full bg-bordo px-5 py-2.5 text-sm font-medium text-cream hover:bg-bordo-deep disabled:opacity-50"
+                          >
+                            Salvar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditando(null)}
+                            className="rounded-full border border-cocoa/15 px-5 py-2.5 text-sm text-cocoa transition-colors hover:border-caramel hover:text-caramel"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
                       </form>
                     </td>
                   </tr>

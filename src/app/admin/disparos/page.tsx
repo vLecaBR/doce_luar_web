@@ -3,16 +3,20 @@ import {
   listarDisparos,
   listarCampanhas,
 } from "@/lib/actions/disparos";
+import { listarClientes } from "@/lib/actions/clientes";
+import { listarSegmentos } from "@/lib/actions/segmentos";
 import { StatusWhatsapp } from "./status-whatsapp";
 import { DisparosManager } from "./disparos-manager";
 
 export const dynamic = "force-dynamic";
 
 export default async function DisparosPage() {
-  const [status, disparos, campanhas] = await Promise.all([
+  const [status, disparos, campanhas, clientes, segmentos] = await Promise.all([
     lerBotStatus(),
     listarDisparos(),
     listarCampanhas(),
+    listarClientes(),
+    listarSegmentos(),
   ]);
 
   return (
@@ -25,8 +29,8 @@ export default async function DisparosPage() {
           Disparos
         </h1>
         <p className="mt-2 text-sm text-cocoa/60">
-          Envie uma mensagem (com imagem, se quiser) para todos os clientes
-          ativos, quando você quiser.
+          Envie uma mensagem (com imagem, se quiser) para todos, um segmento ou
+          pessoas específicas.
         </p>
       </div>
 
@@ -35,6 +39,18 @@ export default async function DisparosPage() {
         <DisparosManager
           disparosIniciais={disparos}
           campanhas={campanhas}
+          clientes={clientes.map((c) => ({
+            id: c.id,
+            nome: c.nome,
+            telefone: c.telefone,
+            ativo: c.ativo,
+            segmentoNome: c.segmento?.nome ?? null,
+          }))}
+          segmentos={segmentos.map((s) => ({
+            id: s.id,
+            nome: s.nome,
+            clientesCount: s._count.clientes,
+          }))}
         />
       </div>
     </div>
