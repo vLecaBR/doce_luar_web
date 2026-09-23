@@ -20,7 +20,19 @@ model Cliente {
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
 
+  segmentoId String?
+  segmento   Segmento? @relation(fields: [segmentoId], references: [id], onDelete: SetNull)
+
   @@map("clientes")
+}
+
+model Segmento {
+  id       String    @id @default(uuid())
+  nome     String    @unique
+  criadoEm DateTime  @default(now())
+  clientes Cliente[]
+
+  @@map("segmentos")
 }
 
 model Categoria {
@@ -69,6 +81,8 @@ model Disparo {
   enviados    Int       @default(0)
   falhas      Int       @default(0)
   erro        String?
+  destinatarios    String[] @default([])
+  descricaoDestino String?
   campanhaId  String?
   campanha    Campanha? @relation(fields: [campanhaId], references: [id], onDelete: SetNull)
   criadoEm    DateTime  @default(now())

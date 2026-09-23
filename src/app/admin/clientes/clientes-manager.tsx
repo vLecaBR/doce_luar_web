@@ -17,15 +17,21 @@ type Cliente = {
   email: string | null;
   notas: string | null;
   ativo: boolean;
+  segmentoId: string | null;
+  segmentoNome: string | null;
 };
+
+type Segmento = { id: string; nome: string };
 
 const inputCls =
   "w-full rounded-xl border border-cocoa/15 bg-white/70 px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-cocoa/35 focus:border-caramel focus:ring-2 focus:ring-caramel/20";
 
 export function ClientesManager({
   clientesIniciais,
+  segmentos,
 }: {
   clientesIniciais: Cliente[];
+  segmentos: Segmento[];
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -93,7 +99,19 @@ export function ClientesManager({
           placeholder="E-mail (opcional)"
           className={inputCls}
         />
-        <input name="notas" placeholder="Notas (opcional)" className={inputCls} />
+        <select name="segmentoId" defaultValue="" className={inputCls}>
+          <option value="">Sem segmento</option>
+          {segmentos.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.nome}
+            </option>
+          ))}
+        </select>
+        <input
+          name="notas"
+          placeholder="Notas (opcional)"
+          className={`${inputCls} sm:col-span-2`}
+        />
         <button
           type="submit"
           disabled={isPending}
@@ -112,7 +130,7 @@ export function ClientesManager({
               <tr className="border-b border-cocoa/10 text-left text-[11px] uppercase tracking-[0.14em] text-caramel">
                 <th className="px-5 py-3 font-medium">Nome</th>
                 <th className="px-5 py-3 font-medium">Telefone</th>
-                <th className="px-5 py-3 font-medium">E-mail</th>
+                <th className="px-5 py-3 font-medium">Segmento</th>
                 <th className="px-5 py-3 font-medium">Status</th>
                 <th className="px-5 py-3 text-right font-medium">Ações</th>
               </tr>
@@ -132,7 +150,7 @@ export function ClientesManager({
                     <td colSpan={5} className="px-5 py-4">
                       <form
                         action={(fd) => onAtualizar(c.id, fd)}
-                        className="grid gap-2 sm:grid-cols-5 sm:items-center"
+                        className="grid gap-2 sm:grid-cols-6 sm:items-center"
                       >
                         <input
                           name="nome"
@@ -151,6 +169,18 @@ export function ClientesManager({
                           defaultValue={c.email ?? ""}
                           className={inputCls}
                         />
+                        <select
+                          name="segmentoId"
+                          defaultValue={c.segmentoId ?? ""}
+                          className={inputCls}
+                        >
+                          <option value="">Sem segmento</option>
+                          {segmentos.map((s) => (
+                            <option key={s.id} value={s.id}>
+                              {s.nome}
+                            </option>
+                          ))}
+                        </select>
                         <input
                           name="notas"
                           defaultValue={c.notas ?? ""}
@@ -178,7 +208,15 @@ export function ClientesManager({
                   <tr key={c.id} className="transition-colors hover:bg-vanilla/30">
                     <td className="px-5 py-3 font-medium text-ink">{c.nome}</td>
                     <td className="px-5 py-3 text-cocoa/70">{c.telefone}</td>
-                    <td className="px-5 py-3 text-cocoa/70">{c.email ?? "—"}</td>
+                    <td className="px-5 py-3">
+                      {c.segmentoNome ? (
+                        <span className="rounded-full bg-vanilla px-2.5 py-0.5 text-xs font-medium text-bordo">
+                          {c.segmentoNome}
+                        </span>
+                      ) : (
+                        <span className="text-cocoa/40">—</span>
+                      )}
+                    </td>
                     <td className="px-5 py-3">
                       <button
                         onClick={() => onToggle(c.id, c.ativo)}

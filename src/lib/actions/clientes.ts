@@ -8,8 +8,6 @@ const PATH = '/admin/clientes';
 
 export type AcaoResultado = { ok?: boolean; error?: string };
 
-// Defesa em profundidade: server action é um endpoint chamável direto,
-// então validamos a sessão antes de qualquer escrita (além do middleware).
 async function requireUser() {
   const supabase = await createClient();
   const {
@@ -31,22 +29,27 @@ function validar(nome: string, telefone: string): string | null {
 }
 
 export async function listarClientes() {
-  return prisma.cliente.findMany({ orderBy: { nome: 'asc' } });
+  return prisma.cliente.findMany({
+    orderBy: { nome: 'asc' },
+    include: { segmento: { select: { nome: true } } },
+  });
 }
 
 export async function criarCliente(formData: FormData): Promise<AcaoResultado> {
   await requireUser();
-
   const nome = String(formData.get('nome') ?? '').trim();
   const telefone = limparTelefone(String(formData.get('telefone') ?? ''));
   const email = String(formData.get('email') ?? '').trim() || null;
   const notas = String(formData.get('notas') ?? '').trim() || null;
+  const segmentoId = String(formData.get('segmentoId') ?? '') || null;
 
   const erro = validar(nome, telefone);
   if (erro) return { error: erro };
 
   try {
-    await prisma.cliente.create({ data: { nome, telefone, email, notas } });
+    await prisma.cliente.create({
+      data: { nome, telefone, email, notas, segmentoId },
+    });
     revalidatePath(PATH);
     return { ok: true };
   } catch (e: any) {
@@ -60,11 +63,11 @@ export async function atualizarCliente(
   formData: FormData,
 ): Promise<AcaoResultado> {
   await requireUser();
-
   const nome = String(formData.get('nome') ?? '').trim();
   const telefone = limparTelefone(String(formData.get('telefone') ?? ''));
   const email = String(formData.get('email') ?? '').trim() || null;
   const notas = String(formData.get('notas') ?? '').trim() || null;
+  const segmentoId = String(formData.get('segmentoId') ?? '') || null;
 
   const erro = validar(nome, telefone);
   if (erro) return { error: erro };
@@ -72,7 +75,7 @@ export async function atualizarCliente(
   try {
     await prisma.cliente.update({
       where: { id },
-      data: { nome, telefone, email, notas },
+      data: { nome, telefone, email, notas, segmentoId },
     });
     revalidatePath(PATH);
     return { ok: true };
