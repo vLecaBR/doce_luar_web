@@ -4,6 +4,40 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { HERO_IMG } from "@/lib/site-data";
 
+function IconInstagram({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    </svg>
+  );
+}
+
+function IconWhatsApp({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.16c-.24.68-1.42 1.31-1.95 1.35-.5.04-.97.23-3.27-.68-2.76-1.09-4.5-3.94-4.64-4.12-.13-.18-1.11-1.48-1.11-2.82 0-1.34.7-2 .95-2.28.24-.27.52-.34.7-.34.17 0 .35 0 .5.01.16.01.38-.06.59.45.24.55.81 1.9.88 2.04.07.14.12.3.02.48-.09.18-.14.3-.28.46-.14.16-.29.36-.42.48-.14.14-.28.29-.12.56.16.27.72 1.18 1.55 1.91 1.07.95 1.97 1.25 2.24 1.39.27.14.43.12.59-.07.16-.19.68-.79.86-1.06.18-.27.36-.22.61-.13.25.09 1.6.75 1.87.89.27.14.45.2.52.32.07.11.07.66-.17 1.34z" />
+    </svg>
+  );
+}
+
 type Categoria = { id: string; label: string; priceLabel: string };
 type Produto = {
   id: string;
@@ -13,6 +47,25 @@ type Produto = {
   categoryId: string;
   img: string | null;
 };
+
+const WHATSAPP = "5516988063501";
+const IFOOD_URL =
+  "https://www.ifood.com.br/delivery/ribeirao-preto-sp/doce-luar-confeitaria-jardim-iraja/a4b8c5ce-8c37-4e79-8a87-36e6dd825fbd?utm_medium=share";
+const INSTAGRAM_URL = "https://www.instagram.com/doceluarconfeitariarp/";
+
+function waLink(texto: string) {
+  return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
+}
+
+const WA_GERAL = waLink(
+  "Olá! Gostaria de fazer um pedido na Doce Luar Confeitaria.",
+);
+
+function pedidoLink(nome: string, descricao: string) {
+  const linhas = [`Olá! Gostaria de fazer um pedido do produto: ${nome}`];
+  if (descricao) linhas.push(`Descrição: ${descricao}`);
+  return waLink(linhas.join("\n"));
+}
 
 const MAPS_QUERY = encodeURIComponent(
   "Rua Abraão Caixe, 786, Ribeirão Preto, SP, 14020-630",
@@ -106,15 +159,17 @@ export function Landing({
           </a>
         </nav>
         <a
-          href="#"
+          href={IFOOD_URL}
+          target="_blank"
+          rel="noopener noreferrer"
           className="rounded-full bg-caramel px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-cream transition-colors hover:bg-caramel-deep md:px-5 md:py-2.5 md:text-xs md:tracking-[0.14em] md:normal-case"
         >
-          <span className="md:hidden">Confeitaria</span>
+          <span className="md:hidden">iFood</span>
           <span className="hidden md:inline">Pedir no iFood</span>
         </a>
       </header>
 
-      {/* ── HERO ────────────────────────────────── */}
+      {/* Hero */}
       <section className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-4 px-6 pt-6 pb-14 md:grid-cols-2 md:gap-12 md:px-10 md:pt-14 md:pb-24">
         <div className="md:order-1">
           <p className="mb-5 text-[11px] uppercase tracking-[0.32em] text-caramel md:text-xs">
@@ -137,7 +192,9 @@ export function Landing({
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center md:mt-11">
             <a
-              href="#"
+              href={IFOOD_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="group flex items-center justify-center gap-3 rounded-full bg-caramel px-6 py-4 text-sm font-medium tracking-wide text-cream shadow-[0_16px_30px_-12px_rgba(182,118,60,0.8)] transition-all duration-300 hover:bg-caramel-deep hover:shadow-[0_18px_34px_-10px_rgba(154,95,44,0.9)] active:scale-[0.98]"
             >
               Pedir agora no iFood
@@ -180,7 +237,7 @@ export function Landing({
         </div>
       </section>
 
-      {/* ── VITRINE / CARROSSEL ─────────────────── */}
+      {/* Vitrine */}
       <section id="vitrine" className="pb-16 md:pb-28">
         <div className="mx-auto flex w-full max-w-6xl items-end justify-between px-6 md:px-10">
           <div>
@@ -271,12 +328,14 @@ export function Landing({
                       <span className="font-serif text-xl text-bordo md:text-2xl">
                         {p.price}
                       </span>
-                      <button
-                        aria-label={`Adicionar ${p.name}`}
-                        className="flex h-9 w-9 items-center justify-center rounded-full border border-caramel/50 text-lg text-caramel transition-colors duration-300 hover:bg-caramel hover:text-cream"
+                      <a
+                        href={pedidoLink(p.name, p.note)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-full bg-caramel px-4 py-2 text-xs font-medium text-cream transition-colors duration-300 hover:bg-caramel-deep"
                       >
-                        +
-                      </button>
+                        Pedir
+                      </a>
                     </div>
                   </article>
                 </Reveal>
@@ -286,26 +345,35 @@ export function Landing({
         )}
       </section>
 
-      {/* ── COMUNIDADE / INSTAGRAM ──────────────── */}
-      {gallery.length > 0 && (
-        <section id="comunidade" className="bg-bordo py-16 text-cream md:py-24">
-          <div className="mx-auto grid w-full max-w-6xl gap-8 px-6 md:grid-cols-[1fr_1.4fr] md:items-center md:gap-16 md:px-10">
-            <Reveal>
-              <p className="text-[11px] uppercase tracking-[0.3em] text-cream/60 md:text-xs">
-                Comunidade
-              </p>
-              <h2 className="mt-3 font-serif text-3xl leading-tight md:text-5xl">
-                Feito para{" "}
-                <span className="italic text-vanilla">dar água na boca</span>
-              </h2>
-              <a
-                href="#"
-                className="mt-4 inline-block text-sm tracking-wide text-vanilla underline decoration-vanilla/40 underline-offset-4 transition-colors hover:decoration-vanilla md:text-base"
-              >
-                @doceluarconfeitariarp
-              </a>
-            </Reveal>
+      {/* Comunidade / Instagram */}
+      <section id="comunidade" className="bg-bordo py-16 text-cream md:py-24">
+        <div
+          className={`mx-auto grid w-full max-w-6xl gap-8 px-6 md:px-10 ${
+            gallery.length > 0
+              ? "md:grid-cols-[1fr_1.4fr] md:items-center md:gap-16"
+              : ""
+          }`}
+        >
+          <Reveal>
+            <p className="text-[11px] uppercase tracking-[0.3em] text-cream/60 md:text-xs">
+              Comunidade
+            </p>
+            <h2 className="mt-3 font-serif text-3xl leading-tight md:text-5xl">
+              Feito para{" "}
+              <span className="italic text-vanilla">dar água na boca</span>
+            </h2>
+            <a
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex items-center gap-2 text-sm tracking-wide text-vanilla underline decoration-vanilla/40 underline-offset-4 transition-colors hover:decoration-vanilla md:text-base"
+            >
+              <IconInstagram />
+              @doceluarconfeitariarp
+            </a>
+          </Reveal>
 
+          {gallery.length > 0 && (
             <div className="grid grid-cols-3 gap-2.5 md:gap-3">
               {gallery.map((p, i) => (
                 <Reveal key={p.id} delay={i * 60}>
@@ -320,17 +388,17 @@ export function Landing({
                 </Reveal>
               ))}
             </div>
-          </div>
-        </section>
-      )}
+          )}
+        </div>
+      </section>
 
-      {/* ── LOCALIZAÇÃO & CONTATO ───────────────── */}
+      {/* Localização e contato */}
       <section id="local" className="mx-auto w-full max-w-6xl px-6 py-16 md:px-10 md:py-24">
         <div className="grid gap-8 md:grid-cols-2 md:items-center md:gap-14">
           <Reveal>
             <div className="relative h-52 overflow-hidden rounded-[26px] border border-cocoa/10 bg-vanilla shadow-[0_20px_44px_-26px_rgba(58,42,34,0.5)] md:h-[420px] md:order-2">
               <iframe
-                title="Mapa — Doce Luar Confeitaria"
+                title="Mapa da Doce Luar Confeitaria"
                 src={MAPS_EMBED}
                 className="h-full w-full border-0"
                 loading="lazy"
@@ -357,8 +425,8 @@ export function Landing({
                 Só passar <span className="italic">e buscar</span>
               </h2>
               <p className="mt-4 max-w-md text-[13px] leading-relaxed text-cocoa/70 md:text-base">
-                Não temos espaço físico para consumo — trabalhamos apenas com
-                retirada. Faça seu pedido pelo WhatsApp ou iFood.
+                Não temos espaço físico para consumo, só retirada. Faça seu
+                pedido pelo WhatsApp ou iFood.
               </p>
             </Reveal>
 
@@ -381,13 +449,18 @@ export function Landing({
 
             <div className="mt-8 grid max-w-md grid-cols-2 gap-3">
               <a
-                href="#"
+                href={WA_GERAL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 rounded-full border border-cocoa/15 bg-white/50 py-3.5 text-sm font-medium text-cocoa transition-all duration-300 hover:border-caramel hover:text-caramel active:scale-[0.98]"
               >
+                <IconWhatsApp />
                 WhatsApp
               </a>
               <a
-                href="#"
+                href={IFOOD_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 rounded-full bg-bordo py-3.5 text-sm font-medium text-cream transition-all duration-300 hover:bg-bordo-deep active:scale-[0.98]"
               >
                 iFood
@@ -405,6 +478,15 @@ export function Landing({
         <p className="mt-2 text-[11px] uppercase tracking-[0.28em] text-caramel">
           Bolos no pote · bolos gelados · doces artesanais
         </p>
+        <a
+          href={INSTAGRAM_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex items-center gap-2 text-sm text-bordo transition-colors hover:text-caramel"
+        >
+          <IconInstagram />
+          @doceluarconfeitariarp
+        </a>
         <p className="mt-5 text-[11px] text-cocoa/40">
           © 2026 Doce Luar Confeitaria · feito com carinho ·{" "}
           <Link
