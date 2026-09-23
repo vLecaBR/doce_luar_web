@@ -33,6 +33,23 @@ function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+function Campo({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-caramel">
+        {label}
+      </span>
+      {children}
+    </label>
+  );
+}
+
 export function ProdutosManager({
   produtosIniciais,
   categorias,
@@ -157,61 +174,75 @@ export function ProdutosManager({
               <form
                 key={p.id}
                 action={(fd) => onAtualizar(p.id, fd)}
-                className="flex flex-col gap-2 rounded-3xl border border-caramel/40 bg-vanilla/40 p-4"
+                className="space-y-4 rounded-3xl border border-caramel/40 bg-vanilla/40 p-5 sm:col-span-2 lg:col-span-3"
               >
-                <input
-                  name="nome"
-                  defaultValue={p.nome}
-                  className={inputCls}
-                  required
-                />
-                <input
-                  name="preco"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  defaultValue={p.preco}
-                  className={inputCls}
-                  required
-                />
-                <select
-                  name="categoriaId"
-                  defaultValue={p.categoriaId}
-                  className={inputCls}
-                  required
-                >
-                  {categorias.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.nome}
-                    </option>
-                  ))}
-                </select>
-                <textarea
-                  name="descricao"
-                  defaultValue={p.descricao ?? ""}
-                  rows={2}
-                  className={inputCls}
-                />
-                <label className="text-[11px] text-cocoa/50">
-                  Trocar imagem (opcional)
-                </label>
-                <input
-                  type="file"
-                  name="imagem"
-                  accept="image/*"
-                  className={fileCls}
-                />
-                <div className="mt-1 flex gap-2">
+                <p className="font-serif text-base text-ink">
+                  Editando: {p.nome}
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Campo label="Nome">
+                    <input
+                      name="nome"
+                      defaultValue={p.nome}
+                      className={inputCls}
+                      required
+                    />
+                  </Campo>
+                  <Campo label="Preço">
+                    <input
+                      name="preco"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      defaultValue={p.preco}
+                      className={inputCls}
+                      required
+                    />
+                  </Campo>
+                  <Campo label="Categoria">
+                    <select
+                      name="categoriaId"
+                      defaultValue={p.categoriaId}
+                      className={inputCls}
+                      required
+                    >
+                      {categorias.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.nome}
+                        </option>
+                      ))}
+                    </select>
+                  </Campo>
+                  <Campo label="Trocar imagem (opcional)">
+                    <input
+                      type="file"
+                      name="imagem"
+                      accept="image/*"
+                      className={fileCls}
+                    />
+                  </Campo>
+                  <div className="sm:col-span-2">
+                    <Campo label="Descrição">
+                      <textarea
+                        name="descricao"
+                        defaultValue={p.descricao ?? ""}
+                        rows={2}
+                        className={inputCls}
+                      />
+                    </Campo>
+                  </div>
+                </div>
+                <div className="flex gap-2">
                   <button
                     disabled={isPending}
-                    className="flex-1 rounded-full bg-bordo px-4 py-2.5 text-sm font-medium text-cream hover:bg-bordo-deep disabled:opacity-50"
+                    className="rounded-full bg-bordo px-5 py-2.5 text-sm font-medium text-cream hover:bg-bordo-deep disabled:opacity-50"
                   >
                     Salvar
                   </button>
                   <button
                     type="button"
                     onClick={() => setEditando(null)}
-                    className="rounded-full border border-cocoa/15 px-4 py-2.5 text-sm text-cocoa transition-colors hover:border-caramel hover:text-caramel"
+                    className="rounded-full border border-cocoa/15 px-5 py-2.5 text-sm text-cocoa transition-colors hover:border-caramel hover:text-caramel"
                   >
                     Cancelar
                   </button>
