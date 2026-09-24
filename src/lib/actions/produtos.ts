@@ -2,7 +2,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 
 const PATH = '/admin/produtos';
@@ -19,6 +19,7 @@ async function requireUser() {
 }
 
 async function uploadImagem(imagem: File): Promise<string> {
+  const supabaseAdmin = getSupabaseAdmin();
   const ext = (imagem.name.split('.').pop() || 'jpg').toLowerCase();
   const nomeArquivo = `${crypto.randomUUID()}.${ext}`;
 
